@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-
 import com.zxn.steplib.ISportStepInterface;
 import com.zxn.steplib.TodayStepManager;
 import com.zxn.steplib.TodayStepService;
@@ -40,10 +39,17 @@ public class MainActivity extends AppCompatActivity {
 
     @BindView(R.id.stepArrayTextView)
     TextView mStepArrayTextView;
+    @BindView(R.id.btn_calorie)
+    Button btnCalorie;
+    @BindView(R.id.btn_km)
+    Button btnKm;
+    @BindView(R.id.btn_time)
+    Button btnTime;
 
     private ISportStepInterface iSportStepInterface;
     private int mStepSum;
     private Handler mDelayHandler = new Handler(new TodayStepCounterCall());
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 //根据时间来获取步数列表
                 if (null != iSportStepInterface) {
                     try {
-                        String stepArray = iSportStepInterface.getTodaySportStepArrayByDate("2018-01-19");
+                        String stepArray = iSportStepInterface.getTodaySportStepArrayByDate("2019-02-18");
                         mStepArrayTextView.setText(stepArray);
                     } catch (RemoteException e) {
                         e.printStackTrace();
@@ -108,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                 //获取多天步数列表
                 if (null != iSportStepInterface) {
                     try {
-                        String stepArray = iSportStepInterface.getTodaySportStepArrayByStartDateAndDays("2018-01-20", 6);
+                        String stepArray = iSportStepInterface.getTodaySportStepArrayByStartDateAndDays("2019-02-18", 6);
                         mStepArrayTextView.setText(stepArray);
                     } catch (RemoteException e) {
                         e.printStackTrace();
@@ -124,10 +130,39 @@ public class MainActivity extends AppCompatActivity {
         tvStepText.setText(mStepSum + "步");
 
     }
+
     private static String TAG = "MainActivity";
     private static final int REFRESH_STEP_WHAT = 0;
     //循环取当前时刻的步数中间的间隔时间
     private long TIME_INTERVAL_REFRESH = 500;
+
+    @OnClick({R.id.btn_calorie, R.id.btn_km, R.id.btn_time})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_calorie:
+                if (null != iSportStepInterface) {
+                    try {
+                        String calorie = iSportStepInterface.getCurrentCalorie();
+                        btnCalorie.setText("卡路里:" + calorie);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case R.id.btn_km:
+                if (null != iSportStepInterface) {
+                    try {
+                        String distance = iSportStepInterface.getCurrentDistance();
+                        btnKm.setText("km:" + distance);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case R.id.btn_time:
+                break;
+        }
+    }
 
     class TodayStepCounterCall implements Handler.Callback {
 

@@ -2,14 +2,12 @@ package com.zxn.steplib;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Build;
@@ -17,9 +15,6 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
-//import android.support.v4.app.NotificationCompat;
-import android.support.v7.app.NotificationCompat;
-import android.text.TextUtils;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -28,8 +23,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import static com.zxn.steplib.SportStepJsonUtils.getCalorieByStep;
 import static com.zxn.steplib.SportStepJsonUtils.getDistanceByStep;
+
 
 /**
  * Created by zxn on 2019/1/28.
@@ -68,7 +63,7 @@ public class TodayStepService extends Service implements Handler.Callback {
 
     private NotificationManager nm;
     Notification notification;
-    private NotificationCompat.Builder builder;
+//    private NotificationCompat.Builder builder;
 
     private boolean mSeparate = false;
     private boolean mBoot = false;
@@ -115,7 +110,8 @@ public class TodayStepService extends Service implements Handler.Callback {
         }
 
         if (null != mMicrolog4Android) {
-            mMicrolog4Android.configure(this);
+            //todo:此行代码存在bug.
+            //mMicrolog4Android.configure(this);
         }
     }
 
@@ -153,7 +149,7 @@ public class TodayStepService extends Service implements Handler.Callback {
 
     private void initNotification(int currentStep) {
 
-        builder = new NotificationCompat.Builder(this);
+        /*builder = new NotificationCompat.Builder(this);
 //        builder = new  NotificationCompat.Builder(this, "channelId");
         builder.setPriority(Notification.PRIORITY_MIN);
 
@@ -186,7 +182,7 @@ public class TodayStepService extends Service implements Handler.Callback {
         builder.setTicker(getString(R.string.app_name));
         builder.setContentTitle(getString(R.string.title_notification_bar, String.valueOf(currentStep)));
         String km = getDistanceByStep(currentStep);
-        String calorie = getCalorieByStep(currentStep);
+//        String calorie = getCalorieByStep(currentStep);
         builder.setContentText(calorie + " 千卡  " + km + " 公里");
 
         //设置不可清除
@@ -196,7 +192,8 @@ public class TodayStepService extends Service implements Handler.Callback {
         startForeground(R.string.app_name, notification);
         nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         //nm.notify(getString(R.string.app_name),1,notification);
-        nm.notify(R.string.app_name, notification);
+        nm.notify(R.string.app_name, notification);*/
+
     }
 
     @Override
@@ -350,7 +347,7 @@ public class TodayStepService extends Service implements Handler.Callback {
      * 更新通知
      */
     private void updateNotification(int stepCount) {
-        if (null == builder || null == nm) {
+        /*if (null == builder || null == nm) {
             return;
         }
         if (!PreferencesHelper.iSShowNotification(this)) {
@@ -361,7 +358,7 @@ public class TodayStepService extends Service implements Handler.Callback {
         String calorie = getCalorieByStep(stepCount);
         builder.setContentText(calorie + " 千卡  " + km + " 公里");
         notification = builder.build();
-        nm.notify(R.string.app_name, notification);
+        nm.notify(R.string.app_name, notification);*/
     }
 
     private boolean isStepCounter() {
@@ -431,6 +428,27 @@ public class TodayStepService extends Service implements Handler.Callback {
                 return jsonArray.toString();
             }
             return null;
+        }
+
+        @Override
+        public String getTodaySportStepArrayByEndDateAndDays(String date, int days) throws RemoteException {
+            if (null != mTodayStepDBHelper) {
+                List<TodayStepData> todayStepDataArrayList = mTodayStepDBHelper.getStepListByEndDateAndDays(date, days);
+                JSONArray jsonArray = getSportStepJsonArray(todayStepDataArrayList);
+                Logger.e(TAG, jsonArray.toString());
+                return jsonArray.toString();
+            }
+            return null;
+        }
+
+        @Override
+        public String getCurrentCalorie() throws RemoteException {
+            return SportStepJsonUtils.getCalorieByStep(TodayStepService.CURRENT_SETP);
+        }
+
+        @Override
+        public String getCurrentDistance() throws RemoteException {
+            return SportStepJsonUtils.getDistanceByStep(CURRENT_SETP);
         }
     };
 

@@ -35,4 +35,27 @@ interface ISportStepInterface {
       * @return
       */
       String getTodaySportStepArrayByStartDateAndDays(String date, int days);
+
+     /**
+      * 根据时间和天数获取步数列表
+      * 例如：
+      * endDate = 2018-01-15
+      * days = 3
+      * 获取 2018-01-15、2018-01-14、2018-01-13三天的步数
+      *
+      * @param endDate 格式yyyy-MM-dd
+      * @param days
+      * @return
+      */
+      String getTodaySportStepArrayByEndDateAndDays(String date, int days);
+      /**
+      *
+      * 获取当前时间运动的卡路里
+      */
+      String getCurrentCalorie();
+
+       /**
+       * 获取当前时间运动的距离
+        */
+       String getCurrentDistance();
 }

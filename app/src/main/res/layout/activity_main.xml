@@ -16,6 +16,8 @@
         android:layout_below="@+id/btn_all_step"
         android:text="根据时间获取步数" />
 
+
+
     <Button
         android:id="@+id/step_from_time_vs_day"
         android:layout_width="wrap_content"
@@ -32,6 +34,26 @@
         android:layout_marginTop="10dp"
         android:text="Hello World!"
         android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/btn_calorie"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_step_text"
+        android:text="获取卡路里" />
+
+    <Button
+        android:id="@+id/btn_km"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_calorie"
+        android:text="获取公里数" />
+    <Button
+        android:id="@+id/btn_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btn_km"
+        android:text="获取时间" />
 
     <ScrollView
         android:layout_width="match_parent"
