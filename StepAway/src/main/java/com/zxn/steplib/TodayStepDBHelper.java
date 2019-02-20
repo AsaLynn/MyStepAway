@@ -16,8 +16,7 @@ import java.util.Set;
 /**
  * Created by zxn on 2019/1/28.
  */
-class TodayStepDBHelper extends SQLiteOpenHelper implements ITodayStepDBHelper{
-
+class TodayStepDBHelper extends SQLiteOpenHelper implements ITodayStepDBHelper {
 
 
     private static final String TAG = "TodayStepDBHelper";
@@ -40,13 +39,13 @@ class TodayStepDBHelper extends SQLiteOpenHelper implements ITodayStepDBHelper{
     private static final String SQL_DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     private static final String SQL_QUERY_ALL = "SELECT * FROM " + TABLE_NAME;
     private static final String SQL_QUERY_STEP = "SELECT * FROM " + TABLE_NAME + " WHERE " + TODAY + " = ? AND " + STEP + " = ?";
-    private static final String SQL_QUERY_STEP_BY_DATE = "SELECT * FROM " + TABLE_NAME + " WHERE " + TODAY + " = ?";
+    private static final String SQL_QUERY_STEP_BY_DATE = "SELECT * FROM " + TABLE_NAME + " WHERE " + TODAY + " = ?" + "GROUP BY TODAY";
     private static final String SQL_DELETE_TODAY = "DELETE FROM " + TABLE_NAME + " WHERE " + TODAY + " = ?";
 
     //只保留mLimit天的数据
     private int mLimit = -1;
 
-    public static ITodayStepDBHelper factory(Context context){
+    public static ITodayStepDBHelper factory(Context context) {
         return new TodayStepDBHelper(context);
     }
 
@@ -146,9 +145,19 @@ class TodayStepDBHelper extends SQLiteOpenHelper implements ITodayStepDBHelper{
             Calendar calendar = Calendar.getInstance();
             calendar.setTimeInMillis(DateUtils.getDateMillis(endDate, DATE_PATTERN_YYYY_MM_DD));
             calendar.add(Calendar.DAY_OF_YEAR, -i);
+            String date = DateUtils.dateFormat(calendar.getTimeInMillis(), DATE_PATTERN_YYYY_MM_DD);
             Cursor cursor = getReadableDatabase().rawQuery(SQL_QUERY_STEP_BY_DATE,
-                    new String[]{DateUtils.dateFormat(calendar.getTimeInMillis(), DATE_PATTERN_YYYY_MM_DD)});
-            todayStepDatas.addAll(getTodayStepDataList(cursor));
+                    new String[]{date});
+            List<TodayStepData> dataList = getTodayStepDataList(cursor);
+            if (null == dataList || dataList.isEmpty()) {
+                TodayStepData todayStepData = new TodayStepData();
+                todayStepData.setStep(0);
+                todayStepData.setToday(date);
+                todayStepData.setDate(0);
+                todayStepDatas.add(todayStepData);
+            } else {
+                todayStepDatas.addAll(dataList);
+            }
             cursor.close();
         }
         return todayStepDatas;
@@ -175,8 +184,9 @@ class TodayStepDBHelper extends SQLiteOpenHelper implements ITodayStepDBHelper{
      * 例如：
      * curDate = 2018-01-10 limit=0;表示只保留2018-01-10
      * curDate = 2018-01-10 limit=1;表示保留2018-01-10、2018-01-09等
+     *
      * @param curDate
-     * @param limit -1失效
+     * @param limit   -1失效
      */
     @Override
     public synchronized void clearCapacity(String curDate, int limit) {

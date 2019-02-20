@@ -1,5 +1,6 @@
 package com.zxn.stepdemo;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +16,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.ztime.lib.ZTimeUtils;
 import com.zxn.steplib.ISportStepInterface;
 import com.zxn.steplib.TodayStepManager;
 import com.zxn.steplib.TodayStepService;
@@ -136,9 +138,31 @@ public class MainActivity extends AppCompatActivity {
     //循环取当前时刻的步数中间的间隔时间
     private long TIME_INTERVAL_REFRESH = 500;
 
-    @OnClick({R.id.btn_calorie, R.id.btn_km, R.id.btn_time})
+    @OnClick({R.id.btn_calorie, R.id.btn_km, R.id.btn_time, R.id.btn_today,R.id.btn_seven})
     public void onClick(View view) {
         switch (view.getId()) {
+            case R.id.btn_seven:
+                if (null != iSportStepInterface) {
+                    try {
+                        String data = ZTimeUtils.getCurrentYearMonthDayTime();
+                        String text = iSportStepInterface.getTodaySportStepArrayByEndDateAndDays(data,7);
+                        mStepArrayTextView.setText(text);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
+            case R.id.btn_today:
+                if (null != iSportStepInterface) {
+                    try {
+                        String data = ZTimeUtils.getCurrentYearMonthDayTime();
+                        String text = iSportStepInterface.getTodaySportStepArrayByDate(data);
+                        mStepArrayTextView.setText(text);
+                    } catch (RemoteException e) {
+                        e.printStackTrace();
+                    }
+                }
+                break;
             case R.id.btn_calorie:
                 if (null != iSportStepInterface) {
                     try {

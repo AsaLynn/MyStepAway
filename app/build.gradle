@@ -31,4 +31,5 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     implementation project(':StepAway')
 //    implementation project(':todaystepcounterlib')
+    implementation 'com.ztime.lib:zTimeUtils:1.0.0'
 }
