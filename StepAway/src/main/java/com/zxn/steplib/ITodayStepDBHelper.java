@@ -30,4 +30,12 @@ interface ITodayStepDBHelper {
      * @return
      */
     List<TodayStepData> getStepListByEndDateAndDays(String endDate, int days);
+
+    /**
+     * 获取指定日期endDate之前的days天的步数
+     * @param endDate
+     * @param days
+     * @return
+     */
+    List<TodayStepData> getStepsByEndDateAndDays(String endDate, int days);
 }

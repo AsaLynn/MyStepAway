@@ -433,7 +433,8 @@ public class TodayStepService extends Service implements Handler.Callback {
         @Override
         public String getTodaySportStepArrayByEndDateAndDays(String date, int days) throws RemoteException {
             if (null != mTodayStepDBHelper) {
-                List<TodayStepData> todayStepDataArrayList = mTodayStepDBHelper.getStepListByEndDateAndDays(date, days);
+                //List<TodayStepData> todayStepDataArrayList = mTodayStepDBHelper.getStepListByEndDateAndDays(date, days);
+                List<TodayStepData> todayStepDataArrayList = mTodayStepDBHelper.getStepsByEndDateAndDays(date, days);
                 JSONArray jsonArray = getSportStepJsonArray(todayStepDataArrayList);
                 Logger.e(TAG, jsonArray.toString());
                 return jsonArray.toString();

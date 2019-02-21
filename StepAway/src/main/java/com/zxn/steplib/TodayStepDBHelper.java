@@ -163,6 +163,23 @@ class TodayStepDBHelper extends SQLiteOpenHelper implements ITodayStepDBHelper {
         return todayStepDatas;
     }
 
+    @Override
+    public List<TodayStepData> getStepsByEndDateAndDays(String endDate, int days) {
+        List<TodayStepData> todayStepDatas = new ArrayList<>();
+        for (int i = 0; i < days; i++) {
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(DateUtils.getDateMillis(endDate, DATE_PATTERN_YYYY_MM_DD));
+            calendar.add(Calendar.DAY_OF_YEAR, -i);
+            String date = DateUtils.dateFormat(calendar.getTimeInMillis(), DATE_PATTERN_YYYY_MM_DD);
+            Cursor cursor = getReadableDatabase().rawQuery(SQL_QUERY_STEP_BY_DATE,
+                    new String[]{date});
+            List<TodayStepData> dataList = getTodayStepDataList(cursor);
+            todayStepDatas.addAll(dataList);
+            cursor.close();
+        }
+        return todayStepDatas;
+    }
+
     private List<TodayStepData> getTodayStepDataList(Cursor cursor) {
 
         List<TodayStepData> todayStepDatas = new ArrayList<>();
