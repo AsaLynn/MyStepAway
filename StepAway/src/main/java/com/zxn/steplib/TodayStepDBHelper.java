@@ -82,7 +82,6 @@ class TodayStepDBHelper extends SQLiteOpenHelper implements ITodayStepDBHelper {
 
     @Override
     public synchronized void insert(TodayStepData todayStepData) {
-
         ContentValues contentValues = new ContentValues();
         contentValues.put(TODAY, todayStepData.getToday());
         contentValues.put(DATE, todayStepData.getDate());
@@ -110,6 +109,16 @@ class TodayStepDBHelper extends SQLiteOpenHelper implements ITodayStepDBHelper {
         List<TodayStepData> todayStepDatas = getTodayStepDataList(cursor);
         cursor.close();
         return todayStepDatas;
+    }
+
+    @Override
+    public boolean updateStepByDate(String dateString, long step) {
+        //getReadableDatabase().rawQuery("", new String[]{});
+        //update(String table, ContentValues values, String whereClause, String[] whereArgs)
+
+        //getWritableDatabase().update("",);
+
+        return false;
     }
 
     /**

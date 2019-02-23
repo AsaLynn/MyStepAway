@@ -158,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
                         String data = ZTimeUtils.getCurrentYearMonthDayTime();
                         String text = iSportStepInterface.getTodaySportStepArrayByDate(data);
                         mStepArrayTextView.setText(text);
+                        Log.i(TAG, "onClick: ---->"+text);
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     }

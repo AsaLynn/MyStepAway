@@ -21,10 +21,19 @@ interface ITodayStepDBHelper {
 
     List<TodayStepData> getStepListByDate(String dateString);
 
+    /**
+     * 更新步数的方法.
+     *
+     * @param dateString
+     * @return
+     */
+    boolean updateStepByDate(String dateString,long step);
+
     List<TodayStepData> getStepListByStartDateAndDays(String startDate, int days);
 
     /**
      * 获取指定日期endDate之前的days天的步数
+     *
      * @param endDate
      * @param days
      * @return
@@ -33,6 +42,7 @@ interface ITodayStepDBHelper {
 
     /**
      * 获取指定日期endDate之前的days天的步数
+     *
      * @param endDate
      * @param days
      * @return
