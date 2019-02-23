@@ -393,6 +393,11 @@ public class TodayStepService extends Service implements Handler.Callback {
             return CURRENT_SETP;
         }
 
+        @Override
+        public void setCurrentTimeSportStep(int stepNum) throws RemoteException {
+            updateTodayStep(stepNum);
+        }
+
         private JSONArray getSportStepJsonArray(List<TodayStepData> todayStepDataArrayList) {
             return SportStepJsonUtils.getSportStepJsonArray(todayStepDataArrayList);
         }
