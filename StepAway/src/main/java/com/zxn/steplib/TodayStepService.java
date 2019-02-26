@@ -38,26 +38,40 @@ public class TodayStepService extends Service implements Handler.Callback {
      */
     private static final int DB_LIMIT = 2;
 
-    //保存数据库频率
+    /**
+     * 保存数据库频率
+     */
     private static final int DB_SAVE_COUNTER = 50;
 
     //传感器的采样周期，这里使用SensorManager.SENSOR_DELAY_FASTEST，如果使用SENSOR_DELAY_UI会导致部分手机后台清理内存之后传感器不记步
     private static final int SAMPLING_PERIOD_US = SensorManager.SENSOR_DELAY_FASTEST;
 
     private static final int HANDLER_WHAT_SAVE_STEP = 0;
+
     //如果走路如果停止，10秒钟后保存数据库
     private static final int LAST_SAVE_STEP_DURATION = 10 * 1000;
 
     private static final int BROADCAST_REQUEST_CODE = 100;
 
+    /**
+     * 0点分隔,处理数据.
+     */
     public static final String INTENT_NAME_0_SEPARATE = "intent_name_0_separate";
+
     public static final String INTENT_NAME_BOOT = "intent_name_boot";
     public static final String INTENT_JOB_SCHEDULER = "intent_job_scheduler";
 
+    /**
+     * 服务器上的步数.
+     */
+    public static final String INTENT_NAME_SERVER_STEP = "intent_name_server_step";
+
+    /**
+     * 当前步数.
+     */
     public static int CURRENT_SETP = 0;
 
     private SensorManager sensorManager;
-    //    private TodayStepDcretor stepDetector;
     private TodayStepDetector mStepDetector;
     private TodayStepCounter stepCounter;
 
@@ -122,6 +136,8 @@ public class TodayStepService extends Service implements Handler.Callback {
         if (null != intent) {
             mSeparate = intent.getBooleanExtra(INTENT_NAME_0_SEPARATE, false);
             mBoot = intent.getBooleanExtra(INTENT_NAME_BOOT, false);
+            CURRENT_SETP = intent.getIntExtra(INTENT_NAME_SERVER_STEP, 0);
+            Logger.e(TAG, "onStartCommand:intent:" + CURRENT_SETP);
         }
 
         mDbSaveCount = 0;
@@ -144,6 +160,7 @@ public class TodayStepService extends Service implements Handler.Callback {
 
         microlog4AndroidError("onStartCommand");
 
+        //kill后会被重启
         return START_STICKY;
     }
 
@@ -219,7 +236,14 @@ public class TodayStepService extends Service implements Handler.Callback {
         if (null != stepCounter) {
             Logger.e(TAG, "已经注册TYPE_STEP_COUNTER");
             WakeLockUtils.getLock(this);
-            CURRENT_SETP = stepCounter.getCurrentStep();
+            Logger.e(TAG, "addStepCounterListener:" + CURRENT_SETP);
+            if (CURRENT_SETP > stepCounter.getCurrentStep()) {
+                PreferencesHelper.setCurrentStep(this, CURRENT_SETP);
+                CURRENT_SETP = stepCounter.getCurrentStep();
+                stepCounter.setCurrentStep(CURRENT_SETP);
+            }
+
+            Logger.e(TAG, "addStepCounterListener:stepCounter:" + CURRENT_SETP);
             updateNotification(CURRENT_SETP);
             return;
         }
@@ -229,6 +253,14 @@ public class TodayStepService extends Service implements Handler.Callback {
         }
         stepCounter = new TodayStepCounter(getApplicationContext(), mOnStepCounterListener, mSeparate, mBoot);
         Logger.e(TAG, "countSensor");
+
+
+        if (CURRENT_SETP > stepCounter.getCurrentStep()) {
+            PreferencesHelper.setCurrentStep(this, CURRENT_SETP);
+            CURRENT_SETP = stepCounter.getCurrentStep();
+            stepCounter.setCurrentStep(CURRENT_SETP);
+        }
+        Logger.e(TAG, "after new TodayStepCounter:" + CURRENT_SETP);
         sensorManager.registerListener(stepCounter, countSensor, SAMPLING_PERIOD_US);
     }
 
@@ -275,15 +307,20 @@ public class TodayStepService extends Service implements Handler.Callback {
      * @param currentStep
      */
     private void updateTodayStep(int currentStep) {
-
+        Logger.e(TAG, "enter updateTodayStep:currentStep:" + currentStep);
+        Logger.e(TAG, "enter updateTodayStep:CURRENT_SETP:" + CURRENT_SETP);
         microlog4AndroidError("   currentStep : " + currentStep);
 
         CURRENT_SETP = currentStep;
+
         updateNotification(CURRENT_SETP);
         saveStep(currentStep);
+        Logger.e(TAG, "after updateTodayStep:CURRENT_SETP:" + CURRENT_SETP);
     }
 
     private void saveStep(int currentStep) {
+        Logger.e(TAG, "enter saveStep:currentStep:" + currentStep);
+
         sHandler.removeMessages(HANDLER_WHAT_SAVE_STEP);
         sHandler.sendEmptyMessageDelayed(HANDLER_WHAT_SAVE_STEP, LAST_SAVE_STEP_DURATION);
 
@@ -303,6 +340,7 @@ public class TodayStepService extends Service implements Handler.Callback {
      * @param currentStep
      */
     private void saveDb(boolean handler, int currentStep) {
+        Logger.e(TAG, "enter saveDb currentStep : " + currentStep);
 
         TodayStepData todayStepData = new TodayStepData();
         todayStepData.setToday(getTodayDate());
@@ -395,7 +433,7 @@ public class TodayStepService extends Service implements Handler.Callback {
 
         @Override
         public void setCurrentTimeSportStep(int stepNum) throws RemoteException {
-            updateTodayStep(stepNum);
+            //updateTodayStep(stepNum);
         }
 
         private JSONArray getSportStepJsonArray(List<TodayStepData> todayStepDataArrayList) {

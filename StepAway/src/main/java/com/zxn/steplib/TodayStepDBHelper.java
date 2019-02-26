@@ -115,9 +115,11 @@ class TodayStepDBHelper extends SQLiteOpenHelper implements ITodayStepDBHelper {
     public boolean updateStepByDate(String dateString, long step) {
         //getReadableDatabase().rawQuery("", new String[]{});
         //update(String table, ContentValues values, String whereClause, String[] whereArgs)
-
         //getWritableDatabase().update("",);
 
+        String sql
+                = "update TodayStepData set step = " + step + "where _id=(select _id from TodayStepData where today = "+dateString+" order by _id desc limit 1)";
+        getWritableDatabase().execSQL(sql);
         return false;
     }
 

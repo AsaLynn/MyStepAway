@@ -25,7 +25,8 @@ public class TodayStepCounter implements SensorEventListener {
     private int sOffsetStep = 0;
     private int sCurrStep = 0;
     private String mTodayDate;
-    private boolean mCleanStep = true;
+    //    private boolean mCleanStep = true;
+    private boolean mCleanStep = false;
     private boolean mShutdown = false;
     /**
      * 用来标识对象第一次创建，
@@ -94,6 +95,7 @@ public class TodayStepCounter implements SensorEventListener {
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
 
             int counterStep = (int) event.values[0];
+            Logger.e(TAG, "onSensorChanged:counterStep:" + counterStep);
 
             if (mCleanStep) {
                 //TODO:只有传感器回调才会记录当前传感器步数，然后对当天步数进行清零，所以步数会少，少的步数等于传感器启动需要的步数，假如传感器需要10步进行启动，那么就少10步
@@ -105,7 +107,8 @@ public class TodayStepCounter implements SensorEventListener {
                     shutdown(counterStep);
                 }
             }
-            sCurrStep = counterStep - sOffsetStep;
+            //sCurrStep = counterStep - sOffsetStep;
+            sCurrStep = counterStep;
 
             if (sCurrStep < 0) {
                 //容错处理，无论任何原因步数不能小于0，如果小于0，直接清零
@@ -113,6 +116,7 @@ public class TodayStepCounter implements SensorEventListener {
                 cleanStep(counterStep);
             }
 
+            Logger.e(TAG, "onSensorChanged :sCurrStep:" + sCurrStep);
             PreferencesHelper.setCurrentStep(mContext, sCurrStep);
             PreferencesHelper.setElapsedRealtime(mContext, SystemClock.elapsedRealtime());
             PreferencesHelper.setLastSensorStep(mContext, counterStep);
@@ -132,7 +136,7 @@ public class TodayStepCounter implements SensorEventListener {
         mCleanStep = false;
         PreferencesHelper.setCleanStep(mContext, mCleanStep);
 
-        Logger.e(TAG, "mCleanStep : " + "清除步数，步数归零");
+        Logger.e(TAG, "mCleanStep :" + mCleanStep + "" + "清除步数，步数归零");
     }
 
     private void shutdown(int counterStep) {
@@ -169,7 +173,8 @@ public class TodayStepCounter implements SensorEventListener {
 
     private synchronized void dateChangeCleanStep() {
         //时间改变了清零，或者0点分隔回调
-        if (!getTodayDate().equals(mTodayDate) || mSeparate) {
+        //if (!getTodayDate().equals(mTodayDate) || mSeparate) {
+        if (mSeparate) {
 
             WakeLockUtils.getLock(mContext);
 
@@ -219,6 +224,10 @@ public class TodayStepCounter implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    public void setCurrentStep(int step) {
+        sCurrStep = step;
     }
 
 

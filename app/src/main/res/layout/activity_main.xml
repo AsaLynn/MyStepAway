@@ -4,75 +4,121 @@
     android:layout_height="match_parent"
     android:layout_below="@id/tv_step_text"
     android:layout_centerHorizontal="true"
-    android:layout_marginTop="30dp"
     android:fillViewport="true">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btn_all_step"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="所有步数" />
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/step_from_time"
-            android:layout_width="wrap_content"
+            <Button
+                android:id="@+id/btn_start"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="同步计步" />
+
+            <Button
+                android:id="@+id/btn_stop"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="停止计步" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="根据时间获取步数" />
+            android:orientation="horizontal">
 
+            <Button
+                android:id="@+id/btn_today"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/btn_km"
+                android:text="今日步数" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/btn_calorie"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="获取卡路里" />
 
-        <Button
-            android:id="@+id/step_from_time_vs_day"
-            android:layout_width="wrap_content"
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/btn_km"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/btn_calorie"
+                android:text="获取公里数" />
+
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/btn_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/btn_km"
+                android:text="获取时间" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="根据时间和天数获取步数" />
+            android:orientation="horizontal">
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/btn_all_step"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="所有步数" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/btn_seven"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/btn_km"
+                android:text="前7天步数" />
 
-        <Button
-            android:id="@+id/btn_calorie"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="获取卡路里" />
+        </LinearLayout>
 
-        <Button
-            android:id="@+id/btn_km"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_calorie"
-            android:text="获取公里数" />
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btn_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_km"
-            android:text="获取时间" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/step_from_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="根据时间获取步数" />
 
-        <Button
-            android:id="@+id/btn_today"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_km"
-            android:text="获取今日日期步数" />
 
-        <Button
-            android:id="@+id/btn_seven"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/btn_km"
-            android:text="获取今日前7天的步数" />
+            <Button
+                android:layout_weight="1"
+                android:id="@+id/step_from_time_vs_day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="根据时间和天数获取步数" />
+
+        </LinearLayout>
 
         <TextView
-            android:layout_gravity="center_horizontal"
             android:id="@+id/tv_step_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
             android:layout_marginTop="10dp"
             android:text="Hello World!"
             android:textSize="20sp" />
+
         <TextView
             android:id="@+id/stepArrayTextView"
             android:layout_width="wrap_content"

@@ -45,6 +45,13 @@ public class TodayStepManager {
         application.startService(intent);
     }
 
+    @Deprecated
+    public static void stopTodayStepService(Application application) {
+        Intent intent = new Intent(application, TodayStepService.class);
+        application.stopService(intent);
+    }
+
+
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     private static void initJobScheduler(Application application) {
         Logger.e(TAG, "initJobScheduler");

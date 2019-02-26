@@ -76,7 +76,7 @@ public class PreferencesHelper {
      * @param cleanStep
      */
     public static void setCleanStep(Context context, boolean cleanStep) {
-        Logger.e(TAG, "setCleanStep");
+        Logger.e(TAG, "setCleanStep:cleanStep:"+cleanStep);
         getSharedPreferences(context).edit().putBoolean(CLEAN_STEP, cleanStep).commit();
     }
 
@@ -88,7 +88,8 @@ public class PreferencesHelper {
      */
     public static boolean getCleanStep(Context context) {
         Logger.e(TAG, "getCleanStep");
-        return getSharedPreferences(context).getBoolean(CLEAN_STEP, true);
+        //return getSharedPreferences(context).getBoolean(CLEAN_STEP, true);
+        return getSharedPreferences(context).getBoolean(CLEAN_STEP, false);
     }
 
     public static void setCurrentStep(Context context, float currStep) {

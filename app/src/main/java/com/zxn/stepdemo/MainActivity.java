@@ -1,6 +1,5 @@
 package com.zxn.stepdemo;
 
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -11,6 +10,7 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
+import android.system.Os;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
     Button btnKm;
     @BindView(R.id.btn_time)
     Button btnTime;
+    @BindView(R.id.btn_seven)
+    Button btnSeven;
 
     private ISportStepInterface iSportStepInterface;
     private int mStepSum;
@@ -58,11 +60,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        //初始化计步模块
-        TodayStepManager.init(getApplication());
+        //todo:将服务器步数同步到本地.
 
+        //todo:绑定服务开始计算步数.
+        //bind();
+
+    }
+
+    private void bind() {
         //开启计步Service，同时绑定Activity进行aidl通信
         Intent intent = new Intent(this, TodayStepService.class);
+        intent.putExtra(TodayStepService.INTENT_NAME_SERVER_STEP, 3000);
         startService(intent);
         bindService(intent, new ServiceConnection() {
             @Override
@@ -76,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 mDelayHandler.sendEmptyMessageDelayed(REFRESH_STEP_WHAT, TIME_INTERVAL_REFRESH);
-
             }
 
             @Override
@@ -84,12 +91,20 @@ public class MainActivity extends AppCompatActivity {
 
             }
         }, Context.BIND_AUTO_CREATE);
+
     }
 
 
-    @OnClick({R.id.btn_all_step, R.id.step_from_time, R.id.step_from_time_vs_day})
+    @OnClick({R.id.btn_all_step, R.id.step_from_time, R.id.step_from_time_vs_day, R.id.btn_start, R.id.btn_stop})
     public void onViewClicked(View view) {
         switch (view.getId()) {
+            case R.id.btn_start:
+                bind();
+                break;
+            case R.id.btn_stop:
+                Log.i(TAG, "onViewClicked: btn_stop");
+                TodayStepManager.stopTodayStepService(getApplication());
+                break;
             case R.id.btn_all_step:
                 //获取所有步数列表
                 if (null != iSportStepInterface) {
@@ -138,14 +153,14 @@ public class MainActivity extends AppCompatActivity {
     //循环取当前时刻的步数中间的间隔时间
     private long TIME_INTERVAL_REFRESH = 500;
 
-    @OnClick({R.id.btn_calorie, R.id.btn_km, R.id.btn_time, R.id.btn_today,R.id.btn_seven})
+    @OnClick({R.id.btn_calorie, R.id.btn_km, R.id.btn_time, R.id.btn_today, R.id.btn_seven})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_seven:
                 if (null != iSportStepInterface) {
                     try {
                         String data = ZTimeUtils.getCurrentYearMonthDayTime();
-                        String text = iSportStepInterface.getTodaySportStepArrayByEndDateAndDays(data,7);
+                        String text = iSportStepInterface.getTodaySportStepArrayByEndDateAndDays(data, 7);
                         mStepArrayTextView.setText(text);
                     } catch (RemoteException e) {
                         e.printStackTrace();
@@ -158,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
                         String data = ZTimeUtils.getCurrentYearMonthDayTime();
                         String text = iSportStepInterface.getTodaySportStepArrayByDate(data);
                         mStepArrayTextView.setText(text);
-                        Log.i(TAG, "onClick: ---->"+text);
+                        Log.i(TAG, "onClick: ---->" + text);
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     }
@@ -188,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
     }
+
 
     class TodayStepCounterCall implements Handler.Callback {
 
