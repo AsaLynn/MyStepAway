@@ -63,8 +63,7 @@ public class MainActivity extends AppCompatActivity {
         //todo:将服务器步数同步到本地.
 
         //todo:绑定服务开始计算步数.
-        //bind();
-
+        bind();
     }
 
     private void bind() {

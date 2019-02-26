@@ -64,7 +64,7 @@ public class TodayStepDetector implements SensorEventListener {
     private long timeOfThisPeak1 = 0;
     private String mTodayDate;
 
-    public TodayStepDetector(Context context, OnStepCounterListener onStepCounterListener){
+    public TodayStepDetector(Context context, OnStepCounterListener onStepCounterListener) {
         super();
         mContext = context;
         this.mOnStepCounterListener = onStepCounterListener;
@@ -73,7 +73,7 @@ public class TodayStepDetector implements SensorEventListener {
 
         mCount = (int) PreferencesHelper.getCurrentStep(mContext);
         mTodayDate = PreferencesHelper.getStepToday(mContext);
-        dateChangeCleanStep();
+        //dateChangeCleanStep();
         initBroadcastReceiver();
 
         updateStepCounter();
@@ -113,7 +113,7 @@ public class TodayStepDetector implements SensorEventListener {
 
             setSteps(0);
 
-            if(null != mOnStepCounterListener){
+            if (null != mOnStepCounterListener) {
                 mOnStepCounterListener.onStepCounterClean();
             }
         }
@@ -125,7 +125,7 @@ public class TodayStepDetector implements SensorEventListener {
         return sdf.format(date);
     }
 
-    private void updateStepCounter(){
+    private void updateStepCounter() {
 
         //每次回调都判断一下是否跨天
         dateChangeCleanStep();
@@ -142,6 +142,7 @@ public class TodayStepDetector implements SensorEventListener {
         }
         gravityNew = (float) Math.sqrt(oriValues[0] * oriValues[0]
                 + oriValues[1] * oriValues[1] + oriValues[2] * oriValues[2]);
+        //Logger.e(TAG, "onSensorChanged:gravityNew:" + gravityNew);
         detectorNewStep(gravityNew);
     }
 
@@ -157,6 +158,8 @@ public class TodayStepDetector implements SensorEventListener {
      * 3.符合时间差条件，波峰波谷差值大于initialValue，则将该差值纳入阈值的计算中
      * */
     private void detectorNewStep(float values) {
+        Logger.e(TAG,"detectorNewStep:gravityOld:"+gravityOld);
+        Logger.e(TAG,"detectorNewStep:values:"+values);
         if (gravityOld == 0) {
             gravityOld = values;
         } else {
@@ -267,8 +270,6 @@ public class TodayStepDetector implements SensorEventListener {
     }
 
 
-
-
     /*
      * 连续走十步才会开始计步
      * 连续走了9步以下,停留超过3秒,则计数清空
@@ -276,20 +277,22 @@ public class TodayStepDetector implements SensorEventListener {
     private void countStep() {
         this.timeOfLastPeak1 = this.timeOfThisPeak1;
         this.timeOfThisPeak1 = System.currentTimeMillis();
-        if (this.timeOfThisPeak1 - this.timeOfLastPeak1 <= 3000L){
-            if(this.count<9){
+        if (this.timeOfThisPeak1 - this.timeOfLastPeak1 <= 3000L) {
+            if (this.count < 9) {
                 this.count++;
-            }else if(this.count == 9){
+            } else if (this.count == 9) {
                 this.count++;
                 this.mCount += this.count;
                 PreferencesHelper.setCurrentStep(mContext, mCount);
+                Logger.e(TAG,"9.countStep:mCount:"+mCount);
                 updateStepCounter();
-            }else{
+            } else {
                 this.mCount++;
                 PreferencesHelper.setCurrentStep(mContext, mCount);
+                Logger.e(TAG,"countStep:mCount:"+mCount);
                 updateStepCounter();
             }
-        }else{//超时
+        } else {//超时
             this.count = 1;//为1,不是0
         }
 

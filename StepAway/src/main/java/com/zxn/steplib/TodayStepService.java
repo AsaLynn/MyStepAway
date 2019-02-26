@@ -136,7 +136,7 @@ public class TodayStepService extends Service implements Handler.Callback {
         if (null != intent) {
             mSeparate = intent.getBooleanExtra(INTENT_NAME_0_SEPARATE, false);
             mBoot = intent.getBooleanExtra(INTENT_NAME_BOOT, false);
-            CURRENT_SETP = intent.getIntExtra(INTENT_NAME_SERVER_STEP, 0);
+            //CURRENT_SETP = intent.getIntExtra(INTENT_NAME_SERVER_STEP, 0);
             Logger.e(TAG, "onStartCommand:intent:" + CURRENT_SETP);
         }
 
@@ -237,11 +237,11 @@ public class TodayStepService extends Service implements Handler.Callback {
             Logger.e(TAG, "已经注册TYPE_STEP_COUNTER");
             WakeLockUtils.getLock(this);
             Logger.e(TAG, "addStepCounterListener:" + CURRENT_SETP);
-            if (CURRENT_SETP > stepCounter.getCurrentStep()) {
-                PreferencesHelper.setCurrentStep(this, CURRENT_SETP);
-                CURRENT_SETP = stepCounter.getCurrentStep();
-                stepCounter.setCurrentStep(CURRENT_SETP);
-            }
+//            if (CURRENT_SETP > stepCounter.getCurrentStep()) {
+//                PreferencesHelper.setCurrentStep(this, CURRENT_SETP);
+//                CURRENT_SETP = stepCounter.getCurrentStep();
+//                stepCounter.setCurrentStep(CURRENT_SETP);
+//            }
 
             Logger.e(TAG, "addStepCounterListener:stepCounter:" + CURRENT_SETP);
             updateNotification(CURRENT_SETP);
@@ -255,11 +255,11 @@ public class TodayStepService extends Service implements Handler.Callback {
         Logger.e(TAG, "countSensor");
 
 
-        if (CURRENT_SETP > stepCounter.getCurrentStep()) {
-            PreferencesHelper.setCurrentStep(this, CURRENT_SETP);
-            CURRENT_SETP = stepCounter.getCurrentStep();
-            stepCounter.setCurrentStep(CURRENT_SETP);
-        }
+//        if (CURRENT_SETP > stepCounter.getCurrentStep()) {
+//            PreferencesHelper.setCurrentStep(this, CURRENT_SETP);
+//            CURRENT_SETP = stepCounter.getCurrentStep();
+//            stepCounter.setCurrentStep(CURRENT_SETP);
+//        }
         Logger.e(TAG, "after new TodayStepCounter:" + CURRENT_SETP);
         sensorManager.registerListener(stepCounter, countSensor, SAMPLING_PERIOD_US);
     }
