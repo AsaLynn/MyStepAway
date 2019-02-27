@@ -107,8 +107,8 @@ public class TodayStepCounter implements SensorEventListener {
                     shutdown(counterStep);
                 }
             }
-            //sCurrStep = counterStep - sOffsetStep;
-            sCurrStep = counterStep;
+            sCurrStep = counterStep - sOffsetStep;
+            //sCurrStep = counterStep;
 
             if (sCurrStep < 0) {
                 //容错处理，无论任何原因步数不能小于0，如果小于0，直接清零

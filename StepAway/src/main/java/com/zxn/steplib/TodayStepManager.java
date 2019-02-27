@@ -12,8 +12,10 @@ import android.content.ServiceConnection;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.zcommon.lib.SdSpUtil;
 
 import io.reactivex.functions.Consumer;
 
@@ -26,28 +28,25 @@ public class TodayStepManager {
     private static final int JOB_ID = 100;
 
 
-    //@RequiresApi(api = Build.VERSION_CODES.N)
-    @SuppressLint("CheckResult")
-    public static void init(final FragmentActivity activity) {
-
-        RxPermissions rxPermissions = new RxPermissions(activity);
-        rxPermissions
-                .request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .subscribe(new Consumer<Boolean>() {
-                    @Override
-                    public void accept(Boolean aBoolean) throws Exception {
-                        onPermissionsInit(activity);
-                    }
-                });
-    }
-
-    private static void onPermissionsInit(FragmentActivity activity) {
+    public static Intent init(final FragmentActivity activity) {
         StepAlertManagerUtils.set0SeparateAlertManager(activity.getApplication());
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 //            initJobScheduler(application);
         }
-        startTodayStepService(activity.getApplication());
+        return startTodayStepService(activity);
+    }
+
+    public static void onPermissionsInit(FragmentActivity activity) {
+        ConfigHelper.configPath(activity);
+        SdSpUtil.saveData(activity, "data", "zxn");
+        Log.i(TAG, "onPermissionsInit: --->" + SdSpUtil.getData(activity, "data", "000"));
+        TodayStepDBHelper.factory(activity.getApplicationContext());
+
+        //StepAlertManagerUtils.set0SeparateAlertManager(activity.getApplication());
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+////            initJobScheduler(application);
+//        }
+        //startTodayStepService(activity.getApplication());
     }
 
     /**
@@ -60,7 +59,7 @@ public class TodayStepManager {
         StepAlertManagerUtils.set0SeparateAlertManager(application);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            initJobScheduler(application);
+            initJobScheduler(application);
         }
 
         startTodayStepService(application);
@@ -76,18 +75,9 @@ public class TodayStepManager {
         application.startService(intent);
     }
 
-    @SuppressLint("CheckResult")
     public static Intent startTodayStepService(final FragmentActivity activity) {
         final Intent intent = new Intent(activity, TodayStepService.class);
-        RxPermissions rxPermissions = new RxPermissions(activity);
-        rxPermissions
-                .request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                .subscribe(new Consumer<Boolean>() {
-                    @Override
-                    public void accept(Boolean aBoolean) throws Exception {
-                        activity.startService(intent);
-                    }
-                });
+        activity.startService(intent);
         return intent;
     }
 

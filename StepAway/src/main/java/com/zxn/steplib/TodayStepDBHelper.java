@@ -45,6 +45,7 @@ class TodayStepDBHelper extends SQLiteOpenHelper implements ITodayStepDBHelper {
     private static final String SQL_QUERY_STEP = "SELECT * FROM " + TABLE_NAME + " WHERE " + TODAY + " = ? AND " + STEP + " = ?";
     private static final String SQL_QUERY_STEP_BY_DATE = "SELECT * FROM " + TABLE_NAME + " WHERE " + TODAY + " = ?" + "GROUP BY TODAY";
     private static final String SQL_DELETE_TODAY = "DELETE FROM " + TABLE_NAME + " WHERE " + TODAY + " = ?";
+    private static ITodayStepDBHelper mDbHelper;
 
     //只保留mLimit天的数据
     private int mLimit = -1;
@@ -54,17 +55,18 @@ class TodayStepDBHelper extends SQLiteOpenHelper implements ITodayStepDBHelper {
 //    }
 
     public static ITodayStepDBHelper factory(Context context) {
-        TodayStepDBHelper dbHelper = null;
+        //TodayStepDBHelper dbHelper = null;
+        if (null != mDbHelper) return mDbHelper;
         try {
             String path = SDUtil.getPathOnSD(context.getPackageName());
             File file = new File(path);
             if (!file.exists())
                 file.mkdirs();
-            dbHelper = new TodayStepDBHelper(context, path);
+            mDbHelper = new TodayStepDBHelper(context, path);
         } catch (Exception var4) {
-            dbHelper = new TodayStepDBHelper(context);
+            mDbHelper = new TodayStepDBHelper(context);
         }
-        return dbHelper;
+        return mDbHelper;
     }
 
     private TodayStepDBHelper(Context context) {

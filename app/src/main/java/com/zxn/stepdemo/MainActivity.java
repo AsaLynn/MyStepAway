@@ -1,8 +1,8 @@
 package com.zxn.stepdemo;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,20 +10,21 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.RemoteException;
 import android.support.v7.app.AppCompatActivity;
-import android.system.Os;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.tbruyelle.rxpermissions2.RxPermissions;
+import com.zcommon.lib.ZToastUtils;
 import com.ztime.lib.ZTimeUtils;
 import com.zxn.steplib.ISportStepInterface;
 import com.zxn.steplib.TodayStepManager;
-import com.zxn.steplib.TodayStepService;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.reactivex.functions.Consumer;
 
 /**
  * Created by zxn on 2019-1-28 10:08:19.
@@ -54,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
     private int mStepSum;
     private Handler mDelayHandler = new Handler(new TodayStepCounterCall());
 
+    @SuppressLint("CheckResult")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,17 +65,72 @@ public class MainActivity extends AppCompatActivity implements ServiceConnection
         //todo:将服务器步数同步到本地.
 
         //todo:绑定服务开始计算步数.
-        bind();
+        RxPermissions rxPermissions = new RxPermissions(this);
+        rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE).subscribe(new Consumer<Boolean>() {
+            @Override
+            public void accept(Boolean aBoolean) throws Exception {
+                if (aBoolean) {
+                    bind();
+                }else {
+                    ZToastUtils.showToast(MainActivity.this,"获取权限失败了!");
+                }
+            }
+        });
     }
 
     private void bind() {
+        TodayStepManager.onPermissionsInit(this);
+        TodayStepManager.init(this);
+
         //开启计步Service，同时绑定Activity进行aidl通信
         //Intent intent = new Intent(this, TodayStepService.class);
         //intent.putExtra(TodayStepService.INTENT_NAME_SERVER_STEP, 3000);
         //startService(intent);
 
-        TodayStepManager.bindService(this, this);
+        TodayStepManager.bindService(this, new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                //Activity和Service通过aidl进行通信
+                iSportStepInterface = ISportStepInterface.Stub.asInterface(service);
+                try {
+                    mStepSum = iSportStepInterface.getCurrentTimeSportStep();
+                    updateStepCount();
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                }
+                mDelayHandler.sendEmptyMessageDelayed(REFRESH_STEP_WHAT, TIME_INTERVAL_REFRESH);
+            }
 
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        });
+
+
+        //TodayStepManager.startTodayStepService(this);
+
+//        Intent intent = new Intent(this, TodayStepService.class);
+//        startService(intent);
+//        bindService(intent, new ServiceConnection() {
+//            @Override
+//            public void onServiceConnected(ComponentName name, IBinder service) {
+//                //Activity和Service通过aidl进行通信
+//                iSportStepInterface = ISportStepInterface.Stub.asInterface(service);
+//                try {
+//                    mStepSum = iSportStepInterface.getCurrentTimeSportStep();
+//                    updateStepCount();
+//                } catch (RemoteException e) {
+//                    e.printStackTrace();
+//                }
+//                mDelayHandler.sendEmptyMessageDelayed(REFRESH_STEP_WHAT, TIME_INTERVAL_REFRESH);
+//            }
+//
+//            @Override
+//            public void onServiceDisconnected(ComponentName name) {
+//
+//            }
+//        }, Context.BIND_AUTO_CREATE);
     }
 
 

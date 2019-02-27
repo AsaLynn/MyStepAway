@@ -1,13 +1,14 @@
 package com.zxn.steplib;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.zcommon.lib.SdSpUtil;
 
 /**
  * Created by zxn on 2019/2/27.
  */
-public class ConfigHelper {
+class ConfigHelper {
 
 
     private static final String TAG = "ConfigHelper";
@@ -101,7 +102,7 @@ public class ConfigHelper {
         Logger.e(TAG, "getCleanStep");
         //return getSharedPreferences(context).getBoolean(CLEAN_STEP, true);
         //return getSharedPreferences(context).getBoolean(CLEAN_STEP, false);
-        return (boolean) SdSpUtil.getData(context, CLEAN_STEP, "");
+        return (boolean) SdSpUtil.getData(context, CLEAN_STEP, true);
     }
 
     public static void setCurrentStep(Context context, float currStep) {

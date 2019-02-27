@@ -243,6 +243,7 @@ public class TodayStepService extends Service implements Handler.Callback {
             Logger.e(TAG, "已经注册TYPE_STEP_COUNTER");
             WakeLockUtils.getLock(this);
             Logger.e(TAG, "addStepCounterListener:" + CURRENT_SETP);
+            CURRENT_SETP = stepCounter.getCurrentStep();
 //            if (CURRENT_SETP > stepCounter.getCurrentStep()) {
 //                ConfigHelper.setCurrentStep(this, CURRENT_SETP);
 //                CURRENT_SETP = stepCounter.getCurrentStep();
