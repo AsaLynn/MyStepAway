@@ -16,6 +16,7 @@ import android.util.Log;
 
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import com.zcommon.lib.SdSpUtil;
+import com.zcommon.lib.ZToastUtils;
 
 import io.reactivex.functions.Consumer;
 
@@ -28,12 +29,25 @@ public class TodayStepManager {
     private static final int JOB_ID = 100;
 
 
-    public static Intent init(final FragmentActivity activity) {
-        StepAlertManagerUtils.set0SeparateAlertManager(activity.getApplication());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            initJobScheduler(application);
-        }
-        return startTodayStepService(activity);
+    @SuppressLint("CheckResult")
+    public static void init(final FragmentActivity activity) {
+        RxPermissions rxPermissions = new RxPermissions(activity);
+        rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        if (aBoolean) {
+                            onPermissionsInit(activity);
+                            StepAlertManagerUtils.set0SeparateAlertManager(activity.getApplication());
+                            startTodayStepService(activity);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                //initJobScheduler(application);
+                            }
+                        } else {
+                            ZToastUtils.showToast(activity, "请开启存储权限否则无法计算步数!");
+                        }
+                    }
+                });
     }
 
     public static void onPermissionsInit(FragmentActivity activity) {
@@ -41,12 +55,6 @@ public class TodayStepManager {
         SdSpUtil.saveData(activity, "data", "zxn");
         Log.i(TAG, "onPermissionsInit: --->" + SdSpUtil.getData(activity, "data", "000"));
         TodayStepDBHelper.factory(activity.getApplicationContext());
-
-        //StepAlertManagerUtils.set0SeparateAlertManager(activity.getApplication());
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-////            initJobScheduler(application);
-//        }
-        //startTodayStepService(activity.getApplication());
     }
 
     /**
@@ -59,7 +67,7 @@ public class TodayStepManager {
         StepAlertManagerUtils.set0SeparateAlertManager(application);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            initJobScheduler(application);
+            //initJobScheduler(application);
         }
 
         startTodayStepService(application);
@@ -116,6 +124,7 @@ public class TodayStepManager {
                 .subscribe(new Consumer<Boolean>() {
                     @Override
                     public void accept(Boolean aBoolean) throws Exception {
+                        onPermissionsInit(activity);
                         activity.startService(intent);
                         activity.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
                     }
