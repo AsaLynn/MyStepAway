@@ -47,16 +47,16 @@ public class TodayStepCounter implements SensorEventListener {
 
         WakeLockUtils.getLock(mContext);
 
-        sCurrStep = (int) PreferencesHelper.getCurrentStep(mContext);
-        mCleanStep = PreferencesHelper.getCleanStep(mContext);
-        mTodayDate = PreferencesHelper.getStepToday(mContext);
-        sOffsetStep = (int) PreferencesHelper.getStepOffset(mContext);
-        mShutdown = PreferencesHelper.getShutdown(mContext);
+        sCurrStep = (int) ConfigHelper.getCurrentStep(mContext);
+        mCleanStep = ConfigHelper.getCleanStep(mContext);
+        mTodayDate = ConfigHelper.getStepToday(mContext);
+        sOffsetStep = (int) ConfigHelper.getStepOffset(mContext);
+        mShutdown = ConfigHelper.getShutdown(mContext);
         Logger.e(TAG, "mShutdown : " + mShutdown);
         //开机启动监听到，一定是关机开机了
         if (mBoot || shutdownBySystemRunningTime()) {
             mShutdown = true;
-            PreferencesHelper.setShutdown(mContext, mShutdown);
+            ConfigHelper.setShutdown(mContext, mShutdown);
             Logger.e(TAG, "开机启动监听到");
         }
 
@@ -117,9 +117,9 @@ public class TodayStepCounter implements SensorEventListener {
             }
 
             Logger.e(TAG, "onSensorChanged :sCurrStep:" + sCurrStep);
-            PreferencesHelper.setCurrentStep(mContext, sCurrStep);
-            PreferencesHelper.setElapsedRealtime(mContext, SystemClock.elapsedRealtime());
-            PreferencesHelper.setLastSensorStep(mContext, counterStep);
+            ConfigHelper.setCurrentStep(mContext, sCurrStep);
+            ConfigHelper.setElapsedRealtime(mContext, SystemClock.elapsedRealtime());
+            ConfigHelper.setLastSensorStep(mContext, counterStep);
 
             Logger.e(TAG, "counterStep : " + counterStep + " --- " + "sOffsetStep : " + sOffsetStep + " --- " + "sCurrStep : " + sCurrStep);
 
@@ -131,28 +131,28 @@ public class TodayStepCounter implements SensorEventListener {
         //清除步数，步数归零，优先级最高
         sCurrStep = 0;
         sOffsetStep = counterStep;
-        PreferencesHelper.setStepOffset(mContext, sOffsetStep);
+        ConfigHelper.setStepOffset(mContext, sOffsetStep);
 
         mCleanStep = false;
-        PreferencesHelper.setCleanStep(mContext, mCleanStep);
+        ConfigHelper.setCleanStep(mContext, mCleanStep);
 
         Logger.e(TAG, "mCleanStep :" + mCleanStep + "" + "清除步数，步数归零");
     }
 
     private void shutdown(int counterStep) {
-        int tmpCurrStep = (int) PreferencesHelper.getCurrentStep(mContext);
+        int tmpCurrStep = (int) ConfigHelper.getCurrentStep(mContext);
         //重新设置offset
         sOffsetStep = counterStep - tmpCurrStep;
-        PreferencesHelper.setStepOffset(mContext, sOffsetStep);
+        ConfigHelper.setStepOffset(mContext, sOffsetStep);
 
         mShutdown = false;
-        PreferencesHelper.setShutdown(mContext, mShutdown);
+        ConfigHelper.setShutdown(mContext, mShutdown);
     }
 
     private boolean shutdownByCounterStep(int counterStep) {
         if (mCounterStepReset) {
             //只判断一次
-            if (counterStep < PreferencesHelper.getLastSensorStep(mContext)) {
+            if (counterStep < ConfigHelper.getLastSensorStep(mContext)) {
                 //当前传感器步数小于上次传感器步数肯定是重新启动了，只是用来增加精度不是绝对的
                 Logger.e(TAG, "当前传感器步数小于上次传感器步数肯定是重新启动了，只是用来增加精度不是绝对的");
                 return true;
@@ -163,7 +163,7 @@ public class TodayStepCounter implements SensorEventListener {
     }
 
     private boolean shutdownBySystemRunningTime() {
-        if (PreferencesHelper.getElapsedRealtime(mContext) > SystemClock.elapsedRealtime()) {
+        if (ConfigHelper.getElapsedRealtime(mContext) > SystemClock.elapsedRealtime()) {
             //上次运行的时间大于当前运行时间判断为重启，只是增加精度，极端情况下连续重启，会判断不出来
             Logger.e(TAG, "上次运行的时间大于当前运行时间判断为重启，只是增加精度，极端情况下连续重启，会判断不出来");
             return true;
@@ -179,20 +179,20 @@ public class TodayStepCounter implements SensorEventListener {
             WakeLockUtils.getLock(mContext);
 
             mCleanStep = true;
-            PreferencesHelper.setCleanStep(mContext, mCleanStep);
+            ConfigHelper.setCleanStep(mContext, mCleanStep);
 
             mTodayDate = getTodayDate();
-            PreferencesHelper.setStepToday(mContext, mTodayDate);
+            ConfigHelper.setStepToday(mContext, mTodayDate);
 
             mShutdown = false;
-            PreferencesHelper.setShutdown(mContext, mShutdown);
+            ConfigHelper.setShutdown(mContext, mShutdown);
 
             mBoot = false;
 
             mSeparate = false;
 
             sCurrStep = 0;
-            PreferencesHelper.setCurrentStep(mContext, sCurrStep);
+            ConfigHelper.setCurrentStep(mContext, sCurrStep);
 
             if (null != mOnStepCounterListener) {
                 mOnStepCounterListener.onStepCounterClean();
@@ -217,7 +217,7 @@ public class TodayStepCounter implements SensorEventListener {
     }
 
     public int getCurrentStep() {
-        sCurrStep = (int) PreferencesHelper.getCurrentStep(mContext);
+        sCurrStep = (int) ConfigHelper.getCurrentStep(mContext);
         return sCurrStep;
     }
 

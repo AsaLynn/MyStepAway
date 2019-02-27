@@ -10,8 +10,8 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 6
-        versionName "1.1.1"
+        versionCode 7
+        versionName "1.1.2"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -41,6 +41,8 @@ dependencies {
     testCompile 'org.robolectric:robolectric:3.0-rc3'
     testCompile 'org.mockito:mockito-core:1.+'
     compile files('libs/microlog4android-1.0.0.jar')
+    implementation 'com.zcommon.lib:zcommonutils:1.0.2'
+    implementation 'com.github.tbruyelle:rxpermissions:0.10.2'
 }
 
 //项目主页
@@ -52,7 +54,7 @@ def libName = "StepAway"
 //发布到组织名称名字，必须填写
 group = "com.zxn.steplib"
 // 版本号，下次更新是只需要更改版本号即可
-version = "1.1.1"
+version = "1.1.2"
 //上面配置后上传至JCenter后的编译路径是这样的： compile 'com.zxn.steplib:StepAway:1.0.0'
 //生成源文件
 task sourcesJar(type: Jar) {

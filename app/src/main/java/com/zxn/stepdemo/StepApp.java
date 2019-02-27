@@ -40,7 +40,8 @@ public class StepApp extends Application {
             }
 
         });*/
-        TodayStepManager.init(this);
+
+        //TodayStepManager.init(this);
     }
 
     public boolean isForeground() {

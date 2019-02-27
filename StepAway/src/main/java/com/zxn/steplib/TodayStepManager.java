@@ -1,13 +1,21 @@
 package com.zxn.steplib;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.FragmentActivity;
+
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
+import io.reactivex.functions.Consumer;
 
 /**
  * Created by zxn on 2019/1/28.
@@ -17,32 +25,70 @@ public class TodayStepManager {
     private static final String TAG = "TodayStepManager";
     private static final int JOB_ID = 100;
 
+
+    //@RequiresApi(api = Build.VERSION_CODES.N)
+    @SuppressLint("CheckResult")
+    public static void init(final FragmentActivity activity) {
+
+        RxPermissions rxPermissions = new RxPermissions(activity);
+        rxPermissions
+                .request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        onPermissionsInit(activity);
+                    }
+                });
+    }
+
+    private static void onPermissionsInit(FragmentActivity activity) {
+        StepAlertManagerUtils.set0SeparateAlertManager(activity.getApplication());
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            initJobScheduler(application);
+        }
+        startTodayStepService(activity.getApplication());
+    }
+
     /**
      * 在程序的最开始调用，最好在自定义的application oncreate中调用
      *
      * @param application
      */
+    @Deprecated
     public static void init(Application application) {
-
-
         StepAlertManagerUtils.set0SeparateAlertManager(application);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 //            initJobScheduler(application);
         }
 
-
         startTodayStepService(application);
     }
 
     public static void init(Application application, boolean show) {
-        PreferencesHelper.setShowNotification(application, show);
+        ConfigHelper.setShowNotification(application, show);
         init(application);
     }
 
     public static void startTodayStepService(Application application) {
         Intent intent = new Intent(application, TodayStepService.class);
         application.startService(intent);
+    }
+
+    @SuppressLint("CheckResult")
+    public static Intent startTodayStepService(final FragmentActivity activity) {
+        final Intent intent = new Intent(activity, TodayStepService.class);
+        RxPermissions rxPermissions = new RxPermissions(activity);
+        rxPermissions
+                .request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        activity.startService(intent);
+                    }
+                });
+        return intent;
     }
 
     @Deprecated
@@ -70,5 +116,19 @@ public class TodayStepManager {
         if (JobScheduler.RESULT_FAILURE == resultCode) {
             Logger.e(TAG, "jobScheduler 失败");
         }
+    }
+
+    @SuppressLint("CheckResult")
+    public static void bindService(final FragmentActivity activity, final ServiceConnection serviceConnection) {
+        final Intent intent = new Intent(activity, TodayStepService.class);
+        RxPermissions rxPermissions = new RxPermissions(activity);
+        rxPermissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean aBoolean) throws Exception {
+                        activity.startService(intent);
+                        activity.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+                    }
+                });
     }
 }

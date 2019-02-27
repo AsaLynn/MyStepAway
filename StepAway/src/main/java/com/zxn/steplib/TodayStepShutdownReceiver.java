@@ -15,7 +15,7 @@ public class TodayStepShutdownReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(Intent.ACTION_SHUTDOWN)) {
             Logger.e(TAG,"TodayStepShutdownReceiver");
-            PreferencesHelper.setShutdown(context,true);
+            ConfigHelper.setShutdown(context,true);
         }
     }
 

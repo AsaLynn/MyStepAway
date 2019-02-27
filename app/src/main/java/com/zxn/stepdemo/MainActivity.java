@@ -28,7 +28,7 @@ import butterknife.OnClick;
 /**
  * Created by zxn on 2019-1-28 10:08:19.
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ServiceConnection {
 
     @BindView(R.id.btn_all_step)
     Button btnAllStep;
@@ -68,28 +68,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void bind() {
         //开启计步Service，同时绑定Activity进行aidl通信
-        Intent intent = new Intent(this, TodayStepService.class);
-        intent.putExtra(TodayStepService.INTENT_NAME_SERVER_STEP, 3000);
-        startService(intent);
-        bindService(intent, new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                //Activity和Service通过aidl进行通信
-                iSportStepInterface = ISportStepInterface.Stub.asInterface(service);
-                try {
-                    mStepSum = iSportStepInterface.getCurrentTimeSportStep();
-                    updateStepCount();
-                } catch (RemoteException e) {
-                    e.printStackTrace();
-                }
-                mDelayHandler.sendEmptyMessageDelayed(REFRESH_STEP_WHAT, TIME_INTERVAL_REFRESH);
-            }
+        //Intent intent = new Intent(this, TodayStepService.class);
+        //intent.putExtra(TodayStepService.INTENT_NAME_SERVER_STEP, 3000);
+        //startService(intent);
 
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-
-            }
-        }, Context.BIND_AUTO_CREATE);
+        TodayStepManager.bindService(this, this);
 
     }
 
@@ -201,6 +184,24 @@ public class MainActivity extends AppCompatActivity {
             case R.id.btn_time:
                 break;
         }
+    }
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        //Activity和Service通过aidl进行通信
+        iSportStepInterface = ISportStepInterface.Stub.asInterface(service);
+        try {
+            mStepSum = iSportStepInterface.getCurrentTimeSportStep();
+            updateStepCount();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+        mDelayHandler.sendEmptyMessageDelayed(REFRESH_STEP_WHAT, TIME_INTERVAL_REFRESH);
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+
     }
 
 

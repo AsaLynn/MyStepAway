@@ -1,5 +1,6 @@
 package com.zxn.steplib;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
@@ -17,11 +18,14 @@ import android.os.Message;
 import android.os.RemoteException;
 import android.util.Log;
 
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
 import org.json.JSONArray;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.function.Consumer;
 
 import static com.zxn.steplib.SportStepJsonUtils.getDistanceByStep;
 
@@ -113,13 +117,15 @@ public class TodayStepService extends Service implements Handler.Callback {
     public void onCreate() {
         Logger.e(TAG, "onCreate:" + CURRENT_SETP);
         super.onCreate();
+        ConfigHelper.configPath(this);
 
+        //mTodayStepDBHelper = TodayStepDBHelper.factory(getApplicationContext());
         mTodayStepDBHelper = TodayStepDBHelper.factory(getApplicationContext());
 
         sensorManager = (SensorManager) this
                 .getSystemService(SENSOR_SERVICE);
 
-        if (PreferencesHelper.iSShowNotification(this)) {
+        if (ConfigHelper.iSShowNotification(this)) {
             initNotification(CURRENT_SETP);
         }
 
@@ -238,7 +244,7 @@ public class TodayStepService extends Service implements Handler.Callback {
             WakeLockUtils.getLock(this);
             Logger.e(TAG, "addStepCounterListener:" + CURRENT_SETP);
 //            if (CURRENT_SETP > stepCounter.getCurrentStep()) {
-//                PreferencesHelper.setCurrentStep(this, CURRENT_SETP);
+//                ConfigHelper.setCurrentStep(this, CURRENT_SETP);
 //                CURRENT_SETP = stepCounter.getCurrentStep();
 //                stepCounter.setCurrentStep(CURRENT_SETP);
 //            }
@@ -256,7 +262,7 @@ public class TodayStepService extends Service implements Handler.Callback {
 
 
 //        if (CURRENT_SETP > stepCounter.getCurrentStep()) {
-//            PreferencesHelper.setCurrentStep(this, CURRENT_SETP);
+//            ConfigHelper.setCurrentStep(this, CURRENT_SETP);
 //            CURRENT_SETP = stepCounter.getCurrentStep();
 //            stepCounter.setCurrentStep(CURRENT_SETP);
 //        }
@@ -388,7 +394,7 @@ public class TodayStepService extends Service implements Handler.Callback {
         /*if (null == builder || null == nm) {
             return;
         }
-        if (!PreferencesHelper.iSShowNotification(this)) {
+        if (!ConfigHelper.iSShowNotification(this)) {
             return;
         }
         builder.setContentTitle(getString(R.string.title_notification_bar, String.valueOf(stepCount)));

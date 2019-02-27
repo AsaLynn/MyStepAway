@@ -5,8 +5,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
+import com.zcommon.lib.SDUtil;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -45,12 +49,30 @@ class TodayStepDBHelper extends SQLiteOpenHelper implements ITodayStepDBHelper {
     //只保留mLimit天的数据
     private int mLimit = -1;
 
+//    public static ITodayStepDBHelper factory(Context context) {
+//        return new TodayStepDBHelper(context);
+//    }
+
     public static ITodayStepDBHelper factory(Context context) {
-        return new TodayStepDBHelper(context);
+        TodayStepDBHelper dbHelper = null;
+        try {
+            String path = SDUtil.getPathOnSD(context.getPackageName());
+            File file = new File(path);
+            if (!file.exists())
+                file.mkdirs();
+            dbHelper = new TodayStepDBHelper(context, path);
+        } catch (Exception var4) {
+            dbHelper = new TodayStepDBHelper(context);
+        }
+        return dbHelper;
     }
 
     private TodayStepDBHelper(Context context) {
         super(context, DATABASE_NAME, null, VERSION);
+    }
+
+    public TodayStepDBHelper(Context context, String path) {
+        super(context, path + "/" + DATABASE_NAME, null, VERSION);
     }
 
     @Override
@@ -118,7 +140,7 @@ class TodayStepDBHelper extends SQLiteOpenHelper implements ITodayStepDBHelper {
         //getWritableDatabase().update("",);
 
         String sql
-                = "update TodayStepData set step = " + step + "where _id=(select _id from TodayStepData where today = "+dateString+" order by _id desc limit 1)";
+                = "update TodayStepData set step = " + step + "where _id=(select _id from TodayStepData where today = " + dateString + " order by _id desc limit 1)";
         getWritableDatabase().execSQL(sql);
         return false;
     }
@@ -253,4 +275,11 @@ class TodayStepDBHelper extends SQLiteOpenHelper implements ITodayStepDBHelper {
     }
 
 
+//    public static String getUserDatabaseFolder(Context context) {
+//        return getSDRoot() + File.separator + context.getPackageName();
+//    }
+//
+//    public static String getSDRoot() {
+//        return Environment.getExternalStorageDirectory().getAbsolutePath();
+//    }
 }

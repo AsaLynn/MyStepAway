@@ -71,8 +71,8 @@ public class TodayStepDetector implements SensorEventListener {
 
         WakeLockUtils.getLock(mContext);
 
-        mCount = (int) PreferencesHelper.getCurrentStep(mContext);
-        mTodayDate = PreferencesHelper.getStepToday(mContext);
+        mCount = (int) ConfigHelper.getCurrentStep(mContext);
+        mTodayDate = ConfigHelper.getStepToday(mContext);
         //dateChangeCleanStep();
         initBroadcastReceiver();
 
@@ -106,10 +106,10 @@ public class TodayStepDetector implements SensorEventListener {
             WakeLockUtils.getLock(mContext);
 
             mCount = 0;
-            PreferencesHelper.setCurrentStep(mContext, mCount);
+            ConfigHelper.setCurrentStep(mContext, mCount);
 
             mTodayDate = getTodayDate();
-            PreferencesHelper.setStepToday(mContext, mTodayDate);
+            ConfigHelper.setStepToday(mContext, mTodayDate);
 
             setSteps(0);
 
@@ -283,12 +283,12 @@ public class TodayStepDetector implements SensorEventListener {
             } else if (this.count == 9) {
                 this.count++;
                 this.mCount += this.count;
-                PreferencesHelper.setCurrentStep(mContext, mCount);
+                ConfigHelper.setCurrentStep(mContext, mCount);
                 Logger.e(TAG,"9.countStep:mCount:"+mCount);
                 updateStepCounter();
             } else {
                 this.mCount++;
-                PreferencesHelper.setCurrentStep(mContext, mCount);
+                ConfigHelper.setCurrentStep(mContext, mCount);
                 Logger.e(TAG,"countStep:mCount:"+mCount);
                 updateStepCounter();
             }
