@@ -37,7 +37,9 @@ interface ITodayStepDBHelper {
      * @param endDate
      * @param days
      * @return
+     * @Deprecated  {@link #getStepsByEndDateAndDays(String, int)}
      */
+    @Deprecated
     List<TodayStepData> getStepListByEndDateAndDays(String endDate, int days);
 
     /**
