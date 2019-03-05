@@ -173,8 +173,8 @@ public class TodayStepCounter implements SensorEventListener {
 
     private synchronized void dateChangeCleanStep() {
         //时间改变了清零，或者0点分隔回调
-        //if (!getTodayDate().equals(mTodayDate) || mSeparate) {
-        if (mSeparate) {
+        if (!getTodayDate().equals(mTodayDate) || mSeparate) {
+            //if (mSeparate) {
 
             WakeLockUtils.getLock(mContext);
 
